@@ -2,6 +2,8 @@ from decimal import Decimal
 from pathlib import Path
 
 import pdfplumber
+from pdfminer.pdfdocument import PDFPasswordIncorrect
+from pdfplumber.utils.exceptions import PdfminerException
 
 from app.core.exceptions import CorruptedPDFError, EncryptedPDFError
 from app.extractors.base import DocumentExtractor
@@ -9,9 +11,9 @@ from app.models.document import ExtractedDocument, ExtractedPage, ExtractedTable
 
 
 class PdfPlumberExtractor(DocumentExtractor):
-    def extract(self, path: Path) -> ExtractedDocument:
+    def extract(self, path: Path, password: str | None = None) -> ExtractedDocument:
         try:
-            with pdfplumber.open(path) as pdf:
+            with pdfplumber.open(path, password=password) as pdf:
                 pages: list[ExtractedPage] = []
                 for page_number, page in enumerate(pdf.pages, start=1):
                     words = [
@@ -27,6 +29,12 @@ class PdfPlumberExtractor(DocumentExtractor):
                     tables = [ExtractedTable(rows=table) for table in (page.extract_tables() or [])]
                     pages.append(ExtractedPage(page_number=page_number, raw_text=page.extract_text() or "", words=words, tables=tables))
                 return ExtractedDocument(pages=pages, metadata=pdf.metadata or {}, extraction_method="pdfplumber")
+        except PDFPasswordIncorrect as exc:
+            raise EncryptedPDFError from exc
+        except PdfminerException as exc:
+            if isinstance(exc.__context__, PDFPasswordIncorrect):
+                raise EncryptedPDFError from exc
+            raise CorruptedPDFError from exc
         except Exception as exc:
             message = str(exc).lower()
             if "password" in message or "encrypt" in message:

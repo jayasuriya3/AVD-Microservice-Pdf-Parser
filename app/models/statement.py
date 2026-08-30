@@ -4,6 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.models.demat import DematAccount
 from app.models.enums import Provider
 
 
@@ -31,5 +32,6 @@ class Statement(BaseModel):
     statement: StatementMetadata
     investor: Investor
     folios: list[object] = Field(default_factory=list)
+    demat_accounts: list[DematAccount] = Field(default_factory=list)
     validation: object | None = None
     confidence: object | None = None

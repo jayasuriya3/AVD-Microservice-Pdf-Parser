@@ -2,7 +2,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
 from app.api.dependencies import get_parse_service, get_repository
 from app.application.parse_service import ParseService
@@ -18,6 +18,7 @@ router = APIRouter(prefix="/v1", tags=["parsing"])
 @router.post("/parse", response_model=Statement, responses={400: {"model": ErrorResponse}})
 async def parse_pdf(
     file: UploadFile = File(...),
+    password: str | None = Form(default=None, max_length=256),
     service: ParseService = Depends(get_parse_service),
     repository: InMemoryParseRepository = Depends(get_repository),
 ) -> Statement:
@@ -35,7 +36,7 @@ async def parse_pdf(
         with NamedTemporaryFile(prefix="cas-", suffix=".pdf", delete=False) as temporary:
             temporary.write(payload)
             temporary_path = Path(temporary.name)
-        result = service.parse_file(temporary_path, parse_id=parse_id)
+        result = service.parse_file(temporary_path, parse_id=parse_id, password=password)
         repository.save(result)
         return result
     except CASParserError as exc:

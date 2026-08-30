@@ -13,12 +13,12 @@ class ExtractionStrategy:
         self.fallback = fallback
         self.settings = settings
 
-    def extract(self, path: Path) -> ExtractedDocument:
-        document = self.primary.extract(path)
+    def extract(self, path: Path, password: str | None = None) -> ExtractedDocument:
+        document = self.primary.extract(path, password=password)
         quality = self.quality(document)
         if quality.sufficient:
             return document
-        fallback_document = self.fallback.extract(path)
+        fallback_document = self.fallback.extract(path, password=password)
         if not self.quality(fallback_document).sufficient:
             raise LowQualityExtractionError
         return fallback_document

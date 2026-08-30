@@ -3,6 +3,7 @@ from enum import StrEnum
 
 class Provider(StrEnum):
     CAMS = "CAMS"
+    CDSL = "CDSL"
     KFINTECH = "KFINTECH"
     UNKNOWN = "UNKNOWN"
 
