@@ -32,6 +32,10 @@ curl -X POST http://localhost:8000/v1/parse -F file=@statement.pdf -F password='
 curl http://localhost:8000/v1/parses/{parse_id}
 ```
 
+The parse endpoint accepts a multipart form with:
+- `file`: required PDF upload
+- `password`: optional PDF password for protected documents
+
 ## Local sample fixture
 
 Generate a sample PDF to exercise the upload and provider-detection flow locally:
@@ -42,6 +46,18 @@ curl -X POST http://localhost:8000/v1/parse -F "file=@tests/fixtures/sample_stat
 ```
 
 This file is only a local sample for testing the API contract. It does not represent a real CAMS/KFintech CAS layout yet.
+
+## Current project status
+
+This repository currently provides the following:
+- FastAPI API shell and OpenAPI contract
+- file validation and upload checks
+- provider detection based on weighted rules
+- extraction strategy with OCR fallback configuration
+- optional ML-based provider classification
+- repository and model structure for future parser work
+
+The service is still intentionally partial for real statement extraction because no approved CAS PDFs are available yet for regression fixtures.
 
 ## Current milestone
 
