@@ -28,8 +28,20 @@ docker compose up --build
 curl http://localhost:8000/health
 curl http://localhost:8000/ready
 curl -X POST http://localhost:8000/v1/parse -F file=@statement.pdf
+curl -X POST http://localhost:8000/v1/parse -F file=@statement.pdf -F password='your-password'
 curl http://localhost:8000/v1/parses/{parse_id}
 ```
+
+## Local sample fixture
+
+Generate a sample PDF to exercise the upload and provider-detection flow locally:
+
+```bash
+python scripts/generate_sample_pdf.py
+curl -X POST http://localhost:8000/v1/parse -F "file=@tests/fixtures/sample_statement.pdf"
+```
+
+This file is only a local sample for testing the API contract. It does not represent a real CAMS/KFintech CAS layout yet.
 
 ## Current milestone
 

@@ -9,9 +9,9 @@ from app.models.document import ExtractedDocument, ExtractedPage, ExtractedTable
 
 
 class PdfPlumberExtractor(DocumentExtractor):
-    def extract(self, path: Path) -> ExtractedDocument:
+    def extract(self, path: Path, password: str | None = None) -> ExtractedDocument:
         try:
-            with pdfplumber.open(path) as pdf:
+            with pdfplumber.open(path, password=password) as pdf:
                 pages: list[ExtractedPage] = []
                 for page_number, page in enumerate(pdf.pages, start=1):
                     words = [

@@ -15,8 +15,8 @@ class ParseService:
         self.classifier = classifier
         self.registry = registry
 
-    def parse_file(self, path: Path, parse_id: UUID | None = None) -> Statement:
-        document = self.extractor.extract(path)
+    def parse_file(self, path: Path, parse_id: UUID | None = None, password: str | None = None) -> Statement:
+        document = self.extractor.extract(path, password=password)
         detection = self.classifier.classify(document)
         if detection.name.value == "UNKNOWN":
             raise UnknownProviderError

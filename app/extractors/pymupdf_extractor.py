@@ -9,9 +9,13 @@ from app.models.document import ExtractedDocument, ExtractedPage, ExtractedWord
 
 
 class PyMuPDFExtractor(DocumentExtractor):
-    def extract(self, path: Path) -> ExtractedDocument:
+    def extract(self, path: Path, password: str | None = None) -> ExtractedDocument:
         try:
             with fitz.open(path) as pdf:
+                if password:
+                    decrypted = pdf.authenticate(password)
+                    if not decrypted:
+                        raise EncryptedPDFError
                 if pdf.is_encrypted:
                     raise EncryptedPDFError
                 pages = []
